@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema Solicitudes TICS 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+/* ─── DESIGN TOKENS ─────────────────────────────────────────────────── */
+:root, [data-theme="light"] {
+  --color-bg: #f7f6f2; --color-surface: #f9f8f5; --color-surface-2: #fbfbf9;
+  --color-surface-offset: #f3f0ec; --color-surface-dynamic: #e6e4df;
+  --color-divider: #dcd9d5; --color-border: #d4d1ca;
+  --color-text: #28251d; --color-text-muted: #7a7974; --color-text-faint: #bab9b4;
+  --color-text-inverse: #f9f8f4;
+  --color-primary: #01696f; --color-primary-hover: #0c4e54;
+  --color-primary-highlight: #cedcd8;
+  --color-success: #437a22; --color-success-highlight: #d4dfcc;
+  --color-warning: #964219; --color-warning-highlight: #ddcfc6;
+  --color-error: #a12c7b; --color-error-highlight: #e0ced7;
+  --color-blue: #006494; --color-blue-highlight: #c6d8e4;
+  --color-gold: #d19900; --color-gold-highlight: #e9e0c6;
+  --font-body: 'Inter', sans-serif; --font-display: 'DM Serif Display', serif;
+  --text-xs: clamp(0.75rem,0.7rem + 0.25vw,0.875rem);
+  --text-sm: clamp(0.875rem,0.8rem + 0.35vw,1rem);
+  --text-base: clamp(1rem,0.95rem + 0.25vw,1.125rem);
+  --text-lg: clamp(1.125rem,1rem + 0.75vw,1.5rem);
+  --text-xl: clamp(1.5rem,1.2rem + 1.25vw,2.25rem);
+  --space-1:.25rem; --space-2:.5rem; --space-3:.75rem; --space-4:1rem;
+  --space-5:1.25rem; --space-6:1.5rem; --space-8:2rem; --space-10:2.5rem;
+  --space-12:3rem; --space-16:4rem;
+  --radius-sm:.375rem; --radius-md:.5rem; --radius-lg:.75rem; --radius-xl:1rem;
+  --radius-full:9999px;
+  --shadow-sm:0 1px 2px oklch(0.2 0.01 80 / .06);
+  --shadow-md:0 4px 12px oklch(0.2 0.01 80 / .08);
+  --shadow-lg:0 12px 32px oklch(0.2 0.01 80 / .12);
+  --transition-interactive:180ms cubic-bezier(0.16,1,0.3,1);
+  --content-default:960px; --content-wide:1200px;
+}
+[data-theme="dark"] {
+  --color-bg:#171614; --color-surface:#1c1b19; --color-surface-2:#201f1d;
+  --color-surface-offset:#1d1c1a; --color-surface-dynamic:#2d2c2a;
+  --color-divider:#262523; --color-border:#393836;
+  --color-text:#cdccca; --color-text-muted:#797876; --color-text-faint:#5a5957;
+  --color-text-inverse:#2b2a28;
+  --color-primary:#4f98a3; --color-primary-hover:#227f8b;
+  --color-primary-highlight:#313b3b;
+  --color-success:#6daa45; --color-success-highlight:#3a4435;
+  --color-warning:#bb653b; --color-warning-highlight:#564942;
+  --color-error:#d163a7; --color-error-highlight:#4c3d46;
+  --color-blue:#5591c7; --color-blue-highlight:#3a4550;
+  --color-gold:#e8af34; --color-gold-highlight:#4d4332;
+  --shadow-sm:0 1px 2px oklch(0 0 0/.2);
+  --shadow-md:0 4px 12px oklch(0 0 0/.3);
+  --shadow-lg:0 12px 32px oklch(0 0 0/.4);
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme]){
+  --color-bg:#171614;--color-surface:#1c1b19;--color-surface-2:#201f1d;
+  --color-surface-offset:#1d1c1a;--color-surface-dynamic:#2d2c2a;
+  --color-divider:#262523;--color-border:#393836;
+  --color-text:#cdccca;--color-text-muted:#797876;--color-text-faint:#5a5957;
+  --color-text-inverse:#2b2a28;
+  --color-primary:#4f98a3;--color-primary-hover:#227f8b;
+  --color-primary-highlight:#313b3b;
+  --color-success:#6daa45;--color-success-highlight:#3a4435;
+  --color-warning:#bb653b;--color-warning-highlight:#564942;
+  --color-error:#d163a7;--color-error-highlight:#4c3d46;
+  --color-blue:#5591c7;--color-blue-highlight:#3a4550;
+  --color-gold:#e8af34;--color-gold-highlight:#4d4332;
+}}
+
+/* ─── BASE ──────────────────────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth;scroll-padding-top:var(--space-16)}
+body{min-height:100dvh;font-family:var(--font-body);font-size:var(--text-base);color:var(--color-text);background:var(--color-bg);line-height:1.6}
+img,svg{display:block;max-width:100%}
+input,button,textarea,select{font:inherit;color:inherit}
+h1,h2,h3,h4{text-wrap:balance;line-height:1.15}
+p,li{text-wrap:pretty;max-width:72ch}
+button{cursor:pointer;background:none;border:none}
+table{border-collapse:collapse;width:100%}
+a,button,[role="button"],input,textarea,select{transition:color var(--transition-interactive),background var(--transition-interactive),border-color var(--transition-interactive),box-shadow var(--transition-interactive)}
+:focus-visible{outline:2px solid var(--color-primary);outline-offset:3px;border-radius:var(--radius-sm)}
+
+/* ─── LAYOUT ─────────────────────────────────────────────────────────── */
+.app-layout{display:grid;grid-template-columns:260px 1fr;grid-template-rows:auto 1fr;min-height:100dvh}
+.topbar{grid-column:1/-1;display:flex;align-items:center;gap:var(--space-4);padding:var(--space-3) var(--space-6);background:var(--color-surface);border-bottom:1px solid var(--color-border);position:sticky;top:0;z-index:100;box-shadow:var(--shadow-sm)}
+.sidebar{background:var(--color-surface-offset);border-right:1px solid var(--color-border);padding:var(--space-6) var(--space-4);display:flex;flex-direction:column;gap:var(--space-2)}
+.main-content{padding:var(--space-8) var(--space-8);overflow-x:hidden}
+
+/* ─── TOPBAR ─────────────────────────────────────────────────────────── */
+.logo{display:flex;align-items:center;gap:var(--space-3);flex:1}
+.logo-icon{width:32px;height:32px;flex-shrink:0}
+.logo-text{font-family:var(--font-display);font-size:var(--text-lg);color:var(--color-primary);line-height:1}
+.logo-sub{font-size:var(--text-xs);color:var(--color-text-muted);line-height:1}
+.topbar-actions{display:flex;align-items:center;gap:var(--space-3)}
+.badge-year{background:var(--color-primary-highlight);color:var(--color-primary);padding:var(--space-1) var(--space-3);border-radius:var(--radius-full);font-size:var(--text-xs);font-weight:600}
+.btn-icon{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:var(--radius-md);color:var(--color-text-muted)}
+.btn-icon:hover{background:var(--color-surface-dynamic);color:var(--color-text)}
+
+/* ─── SIDEBAR ─────────────────────────────────────────────────────────── */
+.sidebar-section-label{font-size:var(--text-xs);font-weight:600;color:var(--color-text-faint);text-transform:uppercase;letter-spacing:.08em;padding:var(--space-3) var(--space-3) var(--space-1)}
+.nav-item{display:flex;align-items:center;gap:var(--space-3);padding:var(--space-2) var(--space-3);border-radius:var(--radius-md);font-size:var(--text-sm);color:var(--color-text-muted);cursor:pointer;border:none;background:none;width:100%;text-align:left}
+.nav-item:hover{background:var(--color-surface-dynamic);color:var(--color-text)}
+.nav-item.active{background:var(--color-primary-highlight);color:var(--color-primary);font-weight:600}
+.nav-item svg{width:16px;height:16px;flex-shrink:0}
+.nav-divider{height:1px;background:var(--color-divider);margin:var(--space-2) 0}
+
+/* ─── PAGE HEADER ─────────────────────────────────────────────────────── */
+.page-header{margin-bottom:var(--space-8)}
+.page-header h1{font-family:var(--font-display);font-size:var(--text-xl);color:var(--color-text);margin-bottom:var(--space-2)}
+.page-header p{font-size:var(--text-sm);color:var(--color-text-muted)}
+.page-view{display:none}
+.page-view.active{display:block}
+
+/* ─── CARDS ─────────────────────────────────────────────────────────── */
+.card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:var(--space-6);box-shadow:var(--shadow-sm)}
+.card-title{font-size:var(--text-lg);font-weight:600;margin-bottom:var(--space-4);color:var(--color-text)}
+.card-subtitle{font-size:var(--text-sm);color:var(--color-text-muted);margin-bottom:var(--space-6)}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4)}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--space-4)}
+
+/* ─── BUTTONS ─────────────────────────────────────────────────────────── */
+.btn{display:inline-flex;align-items:center;gap:var(--space-2);padding:var(--space-2) var(--space-5);border-radius:var(--radius-md);font-size:var(--text-sm);font-weight:500;cursor:pointer;border:none;text-decoration:none}
+.btn-primary{background:var(--color-primary);color:var(--color-text-inverse)}
+.btn-primary:hover{background:var(--color-primary-hover)}
+.btn-secondary{background:var(--color-surface-offset);color:var(--color-text);border:1px solid var(--color-border)}
+.btn-secondary:hover{background:var(--color-surface-dynamic)}
+.btn-ghost{color:var(--color-text-muted)}
+.btn-ghost:hover{color:var(--color-text);background:var(--color-surface-offset)}
+.btn-danger{background:var(--color-error-highlight);color:var(--color-error)}
+.btn-danger:hover{background:var(--color-error);color:var(--color-text-inverse)}
+.btn svg{width:14px;height:14px}
+
+/* ─── FORMS ─────────────────────────────────────────────────────────── */
+.form-group{display:flex;flex-direction:column;gap:var(--space-2);margin-bottom:var(--space-4)}
+.form-label{font-size:var(--text-sm);font-weight:500;color:var(--color-text)}
+.form-required{color:var(--color-error);margin-left:2px}
+.form-control{padding:var(--space-2) var(--space-3);border:1px solid var(--color-border);border-radius:var(--radius-md);background:var(--color-surface-2);color:var(--color-text);font-size:var(--text-sm);transition:border-color var(--transition-interactive),box-shadow var(--transition-interactive)}
+.form-control:focus{outline:none;border-color:var(--color-primary);box-shadow:0 0 0 3px color-mix(in oklch,var(--color-primary) 15%,transparent)}
+.form-hint{font-size:var(--text-xs);color:var(--color-text-muted)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4)}
+textarea.form-control{resize:vertical;min-height:80px}
+select.form-control{cursor:pointer}
+
+/* ─── STATUS BADGES ─────────────────────────────────────────────────── */
+.badge{display:inline-flex;align-items:center;gap:var(--space-1);padding:2px var(--space-2);border-radius:var(--radius-full);font-size:var(--text-xs);font-weight:600}
+.badge-pending{background:var(--color-gold-highlight);color:var(--color-gold)}
+.badge-in-progress{background:var(--color-blue-highlight);color:var(--color-blue)}
+.badge-completed{background:var(--color-success-highlight);color:var(--color-success)}
+.badge-rejected{background:var(--color-error-highlight);color:var(--color-error)}
+.badge-new{background:var(--color-warning-highlight);color:var(--color-warning)}
+.badge-dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+
+/* ─── TABLE ─────────────────────────────────────────────────────────── */
+.table-wrap{overflow-x:auto;border-radius:var(--radius-lg);border:1px solid var(--color-border)}
+.data-table{width:100%;font-size:var(--text-sm)}
+.data-table th{text-align:left;padding:var(--space-3) var(--space-4);background:var(--color-surface-offset);color:var(--color-text-muted);font-weight:600;font-size:var(--text-xs);text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--color-border)}
+.data-table td{padding:var(--space-3) var(--space-4);border-bottom:1px solid var(--color-divider);vertical-align:middle}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:var(--color-surface-offset)}
+.data-table .tabular{font-variant-numeric:tabular-nums}
+
+/* ─── KPI CARDS ─────────────────────────────────────────────────────── */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-4);margin-bottom:var(--space-6)}
+.kpi-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:var(--space-5);box-shadow:var(--shadow-sm)}
+.kpi-label{font-size:var(--text-xs);color:var(--color-text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:var(--space-2)}
+.kpi-value{font-size:var(--text-xl);font-weight:700;color:var(--color-text);font-variant-numeric:tabular-nums;line-height:1}
+.kpi-sub{font-size:var(--text-xs);color:var(--color-text-muted);margin-top:var(--space-1)}
+.kpi-indicator{display:inline-flex;align-items:center;gap:2px;font-size:var(--text-xs);font-weight:600;padding:1px var(--space-2);border-radius:var(--radius-full)}
+.kpi-up{background:var(--color-success-highlight);color:var(--color-success)}
+.kpi-pending-ind{background:var(--color-gold-highlight);color:var(--color-gold)}
+
+/* ─── CIRCULAR / INSTRUCTIVO ─────────────────────────────────────────── */
+.instructivo-section{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:var(--space-4)}
+.instructivo-header{background:var(--color-primary);color:var(--color-text-inverse);padding:var(--space-4) var(--space-6)}
+.instructivo-header h2{font-family:var(--font-display);font-size:var(--text-lg)}
+.instructivo-header p{font-size:var(--text-sm);opacity:.85;margin-top:var(--space-1)}
+.instructivo-body{padding:var(--space-6)}
+.step-list{list-style:none;display:flex;flex-direction:column;gap:var(--space-4)}
+.step-item{display:grid;grid-template-columns:40px 1fr;gap:var(--space-4);align-items:start}
+.step-num{width:40px;height:40px;background:var(--color-primary-highlight);color:var(--color-primary);border-radius:var(--radius-full);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:var(--text-sm);flex-shrink:0}
+.step-content h4{font-size:var(--text-base);font-weight:600;margin-bottom:var(--space-1)}
+.step-content p{font-size:var(--text-sm);color:var(--color-text-muted);max-width:none}
+.step-connector{width:2px;height:var(--space-4);background:var(--color-primary-highlight);margin-left:19px}
+
+/* ─── ROLES ──────────────────────────────────────────────────────────── */
+.roles-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-4)}
+.role-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:var(--space-5);box-shadow:var(--shadow-sm)}
+.role-icon{width:40px;height:40px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;margin-bottom:var(--space-3)}
+.role-title{font-size:var(--text-base);font-weight:700;margin-bottom:var(--space-1)}
+.role-resp{font-size:var(--text-xs);color:var(--color-text-muted);margin-bottom:var(--space-3)}
+.role-tasks{list-style:none;display:flex;flex-direction:column;gap:var(--space-2)}
+.role-tasks li{font-size:var(--text-xs);display:flex;align-items:baseline;gap:var(--space-2);color:var(--color-text-muted)}
+.role-tasks li::before{content:"▸";color:var(--color-primary);flex-shrink:0}
+
+/* ─── PRINT ──────────────────────────────────────────────────────────── */
+.print-header{display:none}
+@media print{
+  .sidebar,.topbar,.topbar-actions,.btn,.no-print{display:none!important}
+  .app-layout{display:block}
+  .main-content{padding:0}
+  .print-header{display:block;text-align:center;margin-bottom:1rem;border-bottom:2px solid #01696f;padding-bottom:1rem}
+  body{font-size:11pt}
+  .page-view{display:block!important}
+}
+
+/* ─── MODAL ──────────────────────────────────────────────────────────── */
+.modal-overlay{position:fixed;inset:0;background:oklch(0 0 0 / .45);display:flex;align-items:center;justify-content:center;z-index:1000;padding:var(--space-4);opacity:0;pointer-events:none;transition:opacity var(--transition-interactive)}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-xl);padding:var(--space-8);max-width:600px;width:100%;box-shadow:var(--shadow-lg);transform:scale(.95);transition:transform var(--transition-interactive)}
+.modal-overlay.open .modal{transform:scale(1)}
+.modal-title{font-family:var(--font-display);font-size:var(--text-lg);margin-bottom:var(--space-6)}
+.modal-actions{display:flex;gap:var(--space-3);justify-content:flex-end;margin-top:var(--space-6);padding-top:var(--space-4);border-top:1px solid var(--color-divider)}
+
+/* ─── TOAST ─────────────────────────────────────────────────────────── */
+.toast-container{position:fixed;bottom:var(--space-6);right:var(--space-6);z-index:2000;display:flex;flex-direction:column;gap:var(--space-2)}
+.toast{background:var(--color-text);color:var(--color-bg);padding:var(--space-3) var(--space-5);border-radius:var(--radius-lg);font-size:var(--text-sm);box-shadow:var(--shadow-lg);animation:toastIn .25s ease forwards}
+@keyframes toastIn{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+/* ─── RESPONSIVE ─────────────────────────────────────────────────────── */
+@media(max-width:768px){
+  .app-layout{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .main-content{padding:var(--space-4)}
+  .kpi-grid{grid-template-columns:1fr 1fr}
+  .roles-grid{grid-template-columns:1fr}
+  .form-row{grid-template-columns:1fr}
+}
+
+/* ─── EMPTY STATE ────────────────────────────────────────────────────── */
+.empty-state{display:flex;flex-direction:column;align-items:center;text-align:center;padding:var(--space-16) var(--space-8);color:var(--color-text-muted)}
+.empty-state svg{width:48px;height:48px;margin-bottom:var(--space-4);color:var(--color-text-faint)}
+.empty-state h3{color:var(--color-text);margin-bottom:var(--space-2)}
+.empty-state p{max-width:36ch;margin-bottom:var(--space-6)}
+
+/* ─── CIRCULAR DOC ───────────────────────────────────────────────────── */
+.circular-doc{background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:var(--space-10);max-width:680px;margin:0 auto}
+.circular-doc .doc-header{text-align:center;margin-bottom:var(--space-8);padding-bottom:var(--space-6);border-bottom:2px solid var(--color-primary)}
+.circular-doc h2{font-family:var(--font-display);font-size:var(--text-xl);margin-bottom:var(--space-2)}
+.circular-doc .meta-row{display:flex;justify-content:space-between;font-size:var(--text-xs);color:var(--color-text-muted);margin-top:var(--space-3)}
+.circular-doc h3{font-size:var(--text-base);font-weight:700;margin:var(--space-6) 0 var(--space-3);text-transform:uppercase;letter-spacing:.04em;color:var(--color-primary)}
+.circular-doc p,.circular-doc li{font-size:var(--text-sm);color:var(--color-text);line-height:1.75;margin-bottom:var(--space-2);max-width:none}
+.circular-doc ol{padding-left:var(--space-6);display:flex;flex-direction:column;gap:var(--space-2)}
+.circular-doc .signature-block{margin-top:var(--space-10);display:grid;grid-template-columns:1fr 1fr;gap:var(--space-8);text-align:center}
+.circular-doc .sig-line{border-top:1px solid var(--color-border);padding-top:var(--space-2);font-size:var(--text-xs);color:var(--color-text-muted)}
+.circular-doc .sig-name{font-weight:700;font-size:var(--text-sm);color:var(--color-text)}
+
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--color-border);margin-bottom:var(--space-6)}
+.tab-btn{padding:var(--space-3) var(--space-5);font-size:var(--text-sm);color:var(--color-text-muted);border-bottom:2px solid transparent;margin-bottom:-1px;background:none;border-top:none;border-left:none;border-right:none;cursor:pointer}
+.tab-btn:hover{color:var(--color-text)}
+.tab-btn.active{color:var(--color-primary);border-bottom-color:var(--color-primary);font-weight:600}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+.section-actions{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-5)}
+.section-actions h2{font-size:var(--text-lg);font-weight:700}
+
+.filter-row{display:flex;gap:var(--space-3);margin-bottom:var(--space-4);align-items:center;flex-wrap:wrap}
+.filter-row select,.filter-row input{padding:var(--space-2) var(--space-3);border:1px solid var(--color-border);border-radius:var(--radius-md);background:var(--color-surface);color:var(--color-text);font-size:var(--text-sm)}
+</style>
+</head>
+<body>
+
+<div class="app-layout">
+
+<!-- ─── TOPBAR ──────────────────────────────────────────────────────── -->
+<header class="topbar">
+  <div class="logo">
+    <svg class="logo-icon" viewBox="0 0 32 32" fill="none" aria-label="TICS 2026 Logo">
+      <rect width="32" height="32" rx="8" fill="var(--color-primary)"/>
+      <rect x="6" y="9" width="8" height="8" rx="2" fill="white" opacity=".9"/>
+      <rect x="18" y="9" width="8" height="8" rx="2" fill="white" opacity=".6"/>
+      <rect x="6" y="21" width="8" height="4" rx="2" fill="white" opacity=".6"/>
+      <rect x="18" y="21" width="8" height="4" rx="2" fill="white" opacity=".9"/>
+    </svg>
+    <div>
+      <div class="logo-text">Sistema TICS</div>
+      <div class="logo-sub">Gestión de Solicitudes</div>
+    </div>
+  </div>
+  <div class="topbar-actions">
+    <span class="badge-year">2026</span>
+    <button class="btn-icon" data-theme-toggle aria-label="Cambiar tema">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+    </button>
+  </div>
+</header>
+
+<!-- ─── SIDEBAR ─────────────────────────────────────────────────────── -->
+<nav class="sidebar" aria-label="Navegación principal">
+  <span class="sidebar-section-label">Principal</span>
+  <button class="nav-item active" data-view="dashboard">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+    Panel General
+  </button>
+  <button class="nav-item" data-view="circular">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10,9 9,9 8,9"/></svg>
+    Circular Instructivo
+  </button>
+  <button class="nav-item" data-view="formulario">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+    Nueva Solicitud
+  </button>
+  <button class="nav-item" data-view="bitacora">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+    Bitácora / Registro
+  </button>
+  <div class="nav-divider"></div>
+  <span class="sidebar-section-label">Configuración</span>
+  <button class="nav-item" data-view="roles">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    Roles y Responsables
+  </button>
+</nav>
+
+<!-- ─── MAIN CONTENT ─────────────────────────────────────────────────── -->
+<main class="main-content" id="main">
+
+  <!-- ═══════════════════ DASHBOARD ═══════════════════════════ -->
+  <div class="page-view active" id="view-dashboard">
+    <div class="page-header">
+      <h1>Panel General</h1>
+      <p>Resumen del sistema de solicitudes TICS — Año 2026</p>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Total Solicitudes</div>
+        <div class="kpi-value" id="kpi-total">0</div>
+        <div class="kpi-sub">registradas en 2026</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Pendientes</div>
+        <div class="kpi-value" id="kpi-pending" style="color:var(--color-gold)">0</div>
+        <div class="kpi-sub"><span class="kpi-indicator kpi-pending-ind">⏳ en revisión</span></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">En Proceso</div>
+        <div class="kpi-value" id="kpi-inprogress" style="color:var(--color-blue)">0</div>
+        <div class="kpi-sub">asignadas o en curso</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Completadas</div>
+        <div class="kpi-value" id="kpi-done" style="color:var(--color-success)">0</div>
+        <div class="kpi-sub"><span class="kpi-indicator kpi-up">✓ resueltas</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-actions">
+        <h2 class="card-title" style="margin-bottom:0">Solicitudes Recientes</h2>
+        <button class="btn btn-primary" onclick="showView('formulario')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Nueva Solicitud
+        </button>
+      </div>
+      <div class="table-wrap" style="margin-top:var(--space-4)">
+        <table class="data-table" id="dashboard-table">
+          <thead>
+            <tr>
+              <th>N° Folio</th>
+              <th>Tipo Insumo</th>
+              <th>Solicitante</th>
+              <th>Fecha</th>
+              <th>Prioridad</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="dashboard-tbody">
+            <tr><td colspan="7"><div class="empty-state" style="padding:var(--space-10)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+              <h3>Sin solicitudes aún</h3>
+              <p>Crea la primera solicitud usando el formulario.</p>
+            </div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ CIRCULAR ═══════════════════════════ -->
+  <div class="page-view" id="view-circular">
+    <div class="page-header">
+      <h1>Circular Instructivo</h1>
+      <p>Documento oficial que establece el procedimiento de solicitudes TICS 2026</p>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="circular-vista">Vista Documento</button>
+      <button class="tab-btn" data-tab="circular-pasos">Pasos del Proceso</button>
+    </div>
+
+    <div class="tab-panel active" id="tab-circular-vista">
+      <div class="circular-doc" id="circular-doc-content">
+        <div class="doc-header">
+          <div style="font-size:var(--text-xs);color:var(--color-text-muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:var(--space-2)">Circular N° 01 — 2026</div>
+          <h2>Instructivo de Procedimiento<br>Solicitudes de Insumos TICS</h2>
+          <div class="meta-row">
+            <span>Establecimiento Educacional</span>
+            <span>Fecha: <span id="circ-fecha">—</span></span>
+          </div>
+          <div class="meta-row">
+            <span>Dirigido a: Todo el personal docente y no docente</span>
+            <span>Responsable: Encargado TICS</span>
+          </div>
+        </div>
+
+        <h3>I. Objeto</h3>
+        <p>El presente instructivo tiene por objeto establecer de manera formal los pasos, formatos y responsabilidades para la solicitud de insumos tecnológicos (TICS) durante el año 2026, asegurando la trazabilidad, equidad y cumplimiento de los conductos regulares institucionales.</p>
+
+        <h3>II. Alcance</h3>
+        <p>Este procedimiento aplica a todo el personal del establecimiento que requiera insumos tecnológicos: hardware, software, consumibles o servicios TIC. Quedan excluidas las adquisiciones directas no autorizadas por Dirección.</p>
+
+        <h3>III. Procedimiento Paso a Paso</h3>
+        <ol>
+          <li><strong>Identificación de la necesidad:</strong> El solicitante detecta la necesidad de un insumo TICS en su área de trabajo o sala de clases.</li>
+          <li><strong>Completar el Formulario Único de Solicitud:</strong> El solicitante llena el formulario digital disponible en el sistema TICS 2026, indicando tipo de insumo, cantidad, justificación pedagógica o técnica y prioridad.</li>
+          <li><strong>Revisión por Encargado TICS:</strong> El Encargado TICS revisa la solicitud dentro de 3 días hábiles, verifica disponibilidad de stock y factibilidad técnica, y actualiza el estado.</li>
+          <li><strong>Visación de Dirección:</strong> Para solicitudes de alto valor o que impliquen adquisición nueva, se requiere visación formal de la Dirección del establecimiento.</li>
+          <li><strong>Gestión de adquisición o asignación:</strong> El Encargado TICS gestiona la asignación del insumo en stock o inicia el proceso de adquisición con la Unidad de Administración.</li>
+          <li><strong>Entrega y cierre:</strong> Se registra la entrega del insumo en la bitácora del sistema. El solicitante firma la recepción conforme y la solicitud se marca como completada.</li>
+        </ol>
+
+        <h3>IV. Plazos</h3>
+        <p>Las solicitudes serán respondidas en un plazo máximo de <strong>5 días hábiles</strong> desde su recepción. En caso de requerir adquisición externa, el plazo se extiende según los procesos de compra institucionales, notificándose al solicitante.</p>
+
+        <h3>V. Responsabilidades</h3>
+        <p><strong>Solicitante:</strong> Completar correctamente el formulario, fundamentar la solicitud y cumplir los plazos. <strong>Encargado TICS:</strong> Gestionar, derivar y hacer seguimiento. <strong>Dirección:</strong> Visar y autorizar adquisiciones. <strong>Administración:</strong> Ejecutar órdenes de compra.</p>
+
+        <h3>VI. Vigencia</h3>
+        <p>El presente instructivo rige a partir de la fecha de su publicación y durante todo el año escolar 2026. Podrá ser actualizado por la Dirección del establecimiento según las necesidades institucionales.</p>
+
+        <div class="signature-block">
+          <div>
+            <div class="sig-line">
+              <div class="sig-name">Director(a) del Establecimiento</div>
+              Firma y Timbre
+            </div>
+          </div>
+          <div>
+            <div class="sig-line">
+              <div class="sig-name">Encargado(a) TICS</div>
+              Firma y Timbre
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:var(--space-3);justify-content:center;margin-top:var(--space-6)" class="no-print">
+        <button class="btn btn-primary" onclick="window.print()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6,9 6,2 18,2 18,9"/><path d="M6,18H4a2,2,0,0,1-2-2V11a2,2,0,0,1,2-2H20a2,2,0,0,1,2,2v5a2,2,0,0,1-2,2H18"/><rect x="6" y="14" width="12" height="8"/></svg>
+          Imprimir / Exportar PDF
+        </button>
+        <button class="btn btn-secondary" onclick="copyCircular()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copiar texto
+        </button>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-circular-pasos">
+      <div class="instructivo-section">
+        <div class="instructivo-header">
+          <h2>Pasos del Proceso de Solicitud TICS</h2>
+          <p>Guía visual del procedimiento establecido en la circular</p>
+        </div>
+        <div class="instructivo-body">
+          <ul class="step-list">
+            <li class="step-item">
+              <div class="step-num">1</div>
+              <div class="step-content">
+                <h4>Identificar la necesidad</h4>
+                <p>El docente o funcionario detecta un requerimiento de insumo tecnológico (computador, proyector, consumible, software, etc.) vinculado a su función pedagógica o administrativa.</p>
+              </div>
+            </li>
+            <div class="step-connector"></div>
+            <li class="step-item">
+              <div class="step-num">2</div>
+              <div class="step-content">
+                <h4>Completar el Formulario Único de Solicitud</h4>
+                <p>Ingresar al Sistema TICS 2026 y completar el formulario digital con todos los campos requeridos: tipo, cantidad, justificación y prioridad. Esto genera un número de folio único.</p>
+              </div>
+            </li>
+            <div class="step-connector"></div>
+            <li class="step-item">
+              <div class="step-num">3</div>
+              <div class="step-content">
+                <h4>Revisión por Encargado TICS</h4>
+                <p>El encargado recibe la notificación, revisa la solicitud en máximo 3 días hábiles, verifica stock y factibilidad, y actualiza el estado a "En Proceso" o "Pendiente aprobación".</p>
+              </div>
+            </li>
+            <div class="step-connector"></div>
+            <li class="step-item">
+              <div class="step-num">4</div>
+              <div class="step-content">
+                <h4>Visación de Dirección (si corresponde)</h4>
+                <p>Las solicitudes que implican adquisición nueva o alto costo son derivadas a Dirección para su visación y aprobación formal antes de proceder.</p>
+              </div>
+            </li>
+            <div class="step-connector"></div>
+            <li class="step-item">
+              <div class="step-num">5</div>
+              <div class="step-content">
+                <h4>Gestión de insumo</h4>
+                <p>Si hay stock disponible, se asigna directamente. Si requiere compra, la Unidad de Administración inicia el proceso de adquisición según normativa vigente.</p>
+              </div>
+            </li>
+            <div class="step-connector"></div>
+            <li class="step-item">
+              <div class="step-num">6</div>
+              <div class="step-content">
+                <h4>Entrega y cierre en bitácora</h4>
+                <p>Se registra la entrega en el sistema, el solicitante confirma la recepción y la solicitud queda marcada como "Completada". La bitácora queda disponible para auditoría.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ FORMULARIO ══════════════════════════ -->
+  <div class="page-view" id="view-formulario">
+    <div class="page-header">
+      <h1>Formulario Único de Solicitud</h1>
+      <p>Complete todos los campos para registrar su solicitud de insumos TICS 2026</p>
+    </div>
+
+    <div class="card" style="max-width:680px">
+      <form id="solicitud-form" novalidate>
+        <div style="background:var(--color-primary-highlight);border-radius:var(--radius-md);padding:var(--space-3) var(--space-4);margin-bottom:var(--space-6);font-size:var(--text-sm);color:var(--color-primary)">
+          <strong>Folio:</strong> <span id="folio-preview">TICS-2026-001</span> — se asignará automáticamente al enviar.
+        </div>
+
+        <h3 style="font-size:var(--text-base);font-weight:700;margin-bottom:var(--space-4);padding-bottom:var(--space-3);border-bottom:1px solid var(--color-divider)">Datos del Solicitante</h3>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="f-nombre">Nombre completo <span class="form-required">*</span></label>
+            <input type="text" id="f-nombre" class="form-control" placeholder="Nombre Apellido" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="f-cargo">Cargo / Función <span class="form-required">*</span></label>
+            <select id="f-cargo" class="form-control" required>
+              <option value="">Seleccionar...</option>
+              <option>Docente</option>
+              <option>Jefe de UTP</option>
+              <option>Inspector(a)</option>
+              <option>Orientador(a)</option>
+              <option>Administrativo(a)</option>
+              <option>Auxiliar</option>
+              <option>Otro</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="f-asignatura">Asignatura / Área</label>
+            <input type="text" id="f-asignatura" class="form-control" placeholder="Ej: Informática, Matemáticas...">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="f-email">Correo electrónico <span class="form-required">*</span></label>
+            <input type="email" id="f-email" class="form-control" placeholder="correo@establecimiento.cl" required>
+          </div>
+        </div>
+
+        <h3 style="font-size:var(--text-base);font-weight:700;margin:var(--space-6) 0 var(--space-4);padding-bottom:var(--space-3);border-bottom:1px solid var(--color-divider)">Detalle del Insumo</h3>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="f-tipo">Tipo de insumo <span class="form-required">*</span></label>
+            <select id="f-tipo" class="form-control" required>
+              <option value="">Seleccionar...</option>
+              <option>Hardware (equipo, periférico)</option>
+              <option>Software / Licencia</option>
+              <option>Consumible (tóner, papel, cable)</option>
+              <option>Reparación / Mantención</option>
+              <option>Conectividad / Red</option>
+              <option>Proyector / Pantalla</option>
+              <option>Tablet / Notebook</option>
+              <option>Otro</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="f-cantidad">Cantidad <span class="form-required">*</span></label>
+            <input type="number" id="f-cantidad" class="form-control" min="1" value="1" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="f-descripcion">Descripción detallada <span class="form-required">*</span></label>
+          <textarea id="f-descripcion" class="form-control" rows="3" placeholder="Especifique el insumo requerido, modelo, características técnicas o cualquier detalle relevante..." required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="f-justificacion">Justificación pedagógica / técnica <span class="form-required">*</span></label>
+          <textarea id="f-justificacion" class="form-control" rows="3" placeholder="Explique por qué se requiere este insumo y cómo contribuye a los objetivos educativos o administrativos..." required></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="f-prioridad">Prioridad <span class="form-required">*</span></label>
+            <select id="f-prioridad" class="form-control" required>
+              <option value="">Seleccionar...</option>
+              <option value="alta">Alta — Urgente, impacta clases</option>
+              <option value="media">Media — Necesario en breve</option>
+              <option value="baja">Baja — Puede esperar</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="f-fecha-req">Fecha requerida</label>
+            <input type="date" id="f-fecha-req" class="form-control">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="f-observaciones">Observaciones adicionales</label>
+          <textarea id="f-observaciones" class="form-control" rows="2" placeholder="Cualquier información complementaria relevante..."></textarea>
+        </div>
+
+        <div style="display:flex;gap:var(--space-3);justify-content:flex-end;padding-top:var(--space-4);border-top:1px solid var(--color-divider)">
+          <button type="button" class="btn btn-ghost" onclick="resetForm()">Limpiar</button>
+          <button type="submit" class="btn btn-primary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20,6 9,17 4,12"/></svg>
+            Registrar Solicitud
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ BITÁCORA ════════════════════════════ -->
+  <div class="page-view" id="view-bitacora">
+    <div class="page-header">
+      <h1>Bitácora de Seguimiento</h1>
+      <p>Registro completo de todas las solicitudes TICS 2026 y su estado de cumplimiento</p>
+    </div>
+
+    <div class="card">
+      <div class="filter-row no-print">
+        <input type="text" id="filter-search" placeholder="Buscar por folio, solicitante, tipo..." style="flex:1;min-width:180px">
+        <select id="filter-estado">
+          <option value="">Todos los estados</option>
+          <option value="Pendiente">Pendiente</option>
+          <option value="En Proceso">En Proceso</option>
+          <option value="Completada">Completada</option>
+          <option value="Rechazada">Rechazada</option>
+        </select>
+        <select id="filter-prioridad">
+          <option value="">Toda prioridad</option>
+          <option value="alta">Alta</option>
+          <option value="media">Media</option>
+          <option value="baja">Baja</option>
+        </select>
+        <button class="btn btn-secondary no-print" onclick="exportCSV()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Exportar CSV
+        </button>
+        <button class="btn btn-secondary no-print" onclick="window.print()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6,9 6,2 18,2 18,9"/><path d="M6,18H4a2,2,0,0,1-2-2V11a2,2,0,0,1,2-2H20a2,2,0,0,1,2,2v5a2,2,0,0,1-2,2H18"/><rect x="6" y="14" width="12" height="8"/></svg>
+          Imprimir
+        </button>
+      </div>
+
+      <div class="table-wrap">
+        <table class="data-table" id="bitacora-table">
+          <thead>
+            <tr>
+              <th>Folio</th>
+              <th>Fecha</th>
+              <th>Solicitante</th>
+              <th>Cargo</th>
+              <th>Tipo</th>
+              <th>Cant.</th>
+              <th>Prioridad</th>
+              <th>Estado</th>
+              <th>Responsable</th>
+              <th class="no-print">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="bitacora-tbody">
+            <tr><td colspan="10"><div class="empty-state" style="padding:var(--space-10)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+              <h3>Bitácora vacía</h3>
+              <p>No hay solicitudes registradas. Crea la primera desde el formulario.</p>
+              <button class="btn btn-primary" onclick="showView('formulario')">Nueva Solicitud</button>
+            </div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ ROLES ═══════════════════════════════ -->
+  <div class="page-view" id="view-roles">
+    <div class="page-header">
+      <h1>Roles y Responsables</h1>
+      <p>Designación formal de roles en cada etapa del procedimiento TICS 2026</p>
+    </div>
+
+    <div class="roles-grid">
+      <div class="role-card">
+        <div class="role-icon" style="background:var(--color-primary-highlight)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <div class="role-title">Solicitante</div>
+        <div class="role-resp" style="color:var(--color-text-muted)">Docente, Funcionario o Administrativo</div>
+        <ul class="role-tasks">
+          <li>Identificar la necesidad TICS en su área</li>
+          <li>Completar el formulario único correctamente</li>
+          <li>Fundamentar pedagógica o técnicamente</li>
+          <li>Recibir y confirmar el insumo entregado</li>
+        </ul>
+      </div>
+
+      <div class="role-card">
+        <div class="role-icon" style="background:var(--color-blue-highlight)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-blue)" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        </div>
+        <div class="role-title">Encargado TICS</div>
+        <div class="role-resp" style="color:var(--color-text-muted)">Docente de Informática / Técnico TIC</div>
+        <ul class="role-tasks">
+          <li>Recibir y revisar solicitudes (máx. 3 días hábiles)</li>
+          <li>Verificar stock y factibilidad técnica</li>
+          <li>Actualizar estado en el sistema</li>
+          <li>Derivar a Dirección si requiere adquisición</li>
+          <li>Gestionar entrega y registrar en bitácora</li>
+        </ul>
+      </div>
+
+      <div class="role-card">
+        <div class="role-icon" style="background:var(--color-gold-highlight)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="2"><path d="M12 2L3 7l9 5 9-5-9-5z"/><path d="M3 17l9 5 9-5"/><path d="M3 12l9 5 9-5"/></svg>
+        </div>
+        <div class="role-title">Dirección</div>
+        <div class="role-resp" style="color:var(--color-text-muted)">Director(a) del Establecimiento</div>
+        <ul class="role-tasks">
+          <li>Visar solicitudes de alto costo</li>
+          <li>Aprobar adquisiciones nuevas</li>
+          <li>Supervisar cumplimiento del procedimiento</li>
+          <li>Actualizar la circular si es necesario</li>
+        </ul>
+      </div>
+
+      <div class="role-card">
+        <div class="role-icon" style="background:var(--color-success-highlight)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-success)" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        </div>
+        <div class="role-title">Administración</div>
+        <div class="role-resp" style="color:var(--color-text-muted)">Secretaría / Administración</div>
+        <ul class="role-tasks">
+          <li>Ejecutar órdenes de compra autorizadas</li>
+          <li>Gestionar pagos y documentación</li>
+          <li>Notificar al encargado TICS de la recepción</li>
+        </ul>
+      </div>
+
+      <div class="role-card">
+        <div class="role-icon" style="background:var(--color-warning-highlight)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-warning)" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        </div>
+        <div class="role-title">Jefe de UTP</div>
+        <div class="role-resp" style="color:var(--color-text-muted)">Unidad Técnico-Pedagógica</div>
+        <ul class="role-tasks">
+          <li>Validar pertinencia pedagógica de la solicitud</li>
+          <li>Priorizar según necesidades curriculares</li>
+          <li>Apoyar la difusión del instructivo</li>
+        </ul>
+      </div>
+
+      <div class="role-card" style="background:var(--color-surface-offset);border-style:dashed">
+        <div class="role-icon" style="background:var(--color-surface-dynamic)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-muted)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <div class="role-title" style="color:var(--color-text-muted)">Nota</div>
+        <div class="role-resp">—</div>
+        <ul class="role-tasks">
+          <li>Todos los roles deben respetar los conductos regulares establecidos en la circular</li>
+          <li>Las comunicaciones deben quedar registradas en el sistema de bitácora</li>
+          <li>Evitar solicitudes informales fuera del sistema</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+</main>
+</div>
+
+<!-- ─── MODAL DETALLE / CAMBIO DE ESTADO ───────────────────────────── -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <h2 class="modal-title" id="modal-title">Actualizar Estado</h2>
+    <div id="modal-body"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" id="modal-confirm">Guardar cambios</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── TOAST CONTAINER ─────────────────────────────────────────────── -->
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+// ─── DATA ──────────────────────────────────────────────────────────────
+let solicitudes = [];
+let folioCounter = 1;
+
+// ─── NAVIGATION ────────────────────────────────────────────────────────
+function showView(viewId){
+  document.querySelectorAll('.page-view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const view=document.getElementById('view-'+viewId);
+  if(view)view.classList.add('active');
+  const nav=document.querySelector(`.nav-item[data-view="${viewId}"]`);
+  if(nav)nav.classList.add('active');
+  if(viewId==='bitacora')renderBitacora();
+  if(viewId==='dashboard')renderDashboard();
+}
+document.querySelectorAll('.nav-item[data-view]').forEach(btn=>{
+  btn.addEventListener('click',()=>showView(btn.dataset.view));
+});
+
+// ─── TABS ──────────────────────────────────────────────────────────────
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const container=btn.closest('.tabs').parentElement;
+    btn.closest('.tabs').querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    container.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+    const panel=container.querySelector('#tab-'+btn.dataset.tab);
+    if(panel)panel.classList.add('active');
+  });
+});
+
+// ─── DARK MODE ─────────────────────────────────────────────────────────
+(function(){
+  const t=document.querySelector('[data-theme-toggle]'),r=document.documentElement;
+  let d=matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';
+  r.setAttribute('data-theme',d);
+  if(t)t.addEventListener('click',()=>{
+    d=d==='dark'?'light':'dark';
+    r.setAttribute('data-theme',d);
+  });
+})();
+
+// ─── FORMULARIO ────────────────────────────────────────────────────────
+function genFolio(){
+  const n=String(folioCounter).padStart(3,'0');
+  return `TICS-2026-${n}`;
+}
+function updateFolioPreview(){
+  document.getElementById('folio-preview').textContent=genFolio();
+}
+updateFolioPreview();
+
+document.getElementById('solicitud-form').addEventListener('submit',function(e){
+  e.preventDefault();
+  const nombre=document.getElementById('f-nombre').value.trim();
+  const cargo=document.getElementById('f-cargo').value;
+  const asignatura=document.getElementById('f-asignatura').value.trim();
+  const email=document.getElementById('f-email').value.trim();
+  const tipo=document.getElementById('f-tipo').value;
+  const cantidad=document.getElementById('f-cantidad').value;
+  const descripcion=document.getElementById('f-descripcion').value.trim();
+  const justificacion=document.getElementById('f-justificacion').value.trim();
+  const prioridad=document.getElementById('f-prioridad').value;
+  const fechaReq=document.getElementById('f-fecha-req').value;
+  const observaciones=document.getElementById('f-observaciones').value.trim();
+
+  if(!nombre||!cargo||!email||!tipo||!cantidad||!descripcion||!justificacion||!prioridad){
+    toast('⚠️ Complete todos los campos obligatorios','warning');return;
+  }
+
+  const solicitud={
+    folio:genFolio(),
+    fecha:new Date().toLocaleDateString('es-CL'),
+    timestamp:Date.now(),
+    nombre, cargo, asignatura, email,
+    tipo, cantidad:parseInt(cantidad),
+    descripcion, justificacion, prioridad,
+    fechaReq, observaciones,
+    estado:'Pendiente',
+    responsable:'Encargado TICS',
+    historial:[{fecha:new Date().toLocaleDateString('es-CL'),accion:'Solicitud registrada',usuario:'Sistema'}]
+  };
+  solicitudes.push(solicitud);
+  folioCounter++;
+  updateFolioPreview();
+  renderDashboard();
+  toast(`✓ Solicitud ${solicitud.folio} registrada exitosamente`);
+  resetForm();
+  showView('bitacora');
+});
+
+function resetForm(){
+  document.getElementById('solicitud-form').reset();
+  updateFolioPreview();
+}
+
+// ─── RENDER DASHBOARD ──────────────────────────────────────────────────
+function renderDashboard(){
+  document.getElementById('kpi-total').textContent=solicitudes.length;
+  document.getElementById('kpi-pending').textContent=solicitudes.filter(s=>s.estado==='Pendiente').length;
+  document.getElementById('kpi-inprogress').textContent=solicitudes.filter(s=>s.estado==='En Proceso').length;
+  document.getElementById('kpi-done').textContent=solicitudes.filter(s=>s.estado==='Completada').length;
+
+  const tbody=document.getElementById('dashboard-tbody');
+  if(!solicitudes.length){
+    tbody.innerHTML=`<tr><td colspan="7"><div class="empty-state" style="padding:var(--space-10)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+      <h3>Sin solicitudes aún</h3><p>Crea la primera solicitud usando el formulario.</p>
+    </div></td></tr>`;return;
+  }
+  const recent=[...solicitudes].sort((a,b)=>b.timestamp-a.timestamp).slice(0,8);
+  tbody.innerHTML=recent.map(s=>`
+    <tr>
+      <td><code style="font-size:var(--text-xs);color:var(--color-primary)">${s.folio}</code></td>
+      <td>${s.tipo}</td>
+      <td>${s.nombre}</td>
+      <td class="tabular" style="font-size:var(--text-xs);color:var(--color-text-muted)">${s.fecha}</td>
+      <td>${prioridadBadge(s.prioridad)}</td>
+      <td>${estadoBadge(s.estado)}</td>
+      <td><button class="btn btn-ghost" style="font-size:var(--text-xs)" onclick="openModal('${s.folio}')">Actualizar</button></td>
+    </tr>`).join('');
+}
+
+// ─── RENDER BITÁCORA ───────────────────────────────────────────────────
+function renderBitacora(data){
+  const tbody=document.getElementById('bitacora-tbody');
+  const src=data||solicitudes;
+  if(!src.length){
+    tbody.innerHTML=`<tr><td colspan="10"><div class="empty-state" style="padding:var(--space-10)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+      <h3>Bitácora vacía</h3><p>No hay solicitudes registradas.</p>
+      <button class="btn btn-primary" onclick="showView('formulario')">Nueva Solicitud</button>
+    </div></td></tr>`;return;
+  }
+  tbody.innerHTML=src.map(s=>`
+    <tr>
+      <td><code style="font-size:var(--text-xs);color:var(--color-primary)">${s.folio}</code></td>
+      <td class="tabular" style="font-size:var(--text-xs);color:var(--color-text-muted)">${s.fecha}</td>
+      <td style="font-weight:500">${s.nombre}</td>
+      <td style="font-size:var(--text-xs);color:var(--color-text-muted)">${s.cargo}</td>
+      <td style="font-size:var(--text-xs)">${s.tipo}</td>
+      <td class="tabular" style="text-align:center">${s.cantidad}</td>
+      <td>${prioridadBadge(s.prioridad)}</td>
+      <td>${estadoBadge(s.estado)}</td>
+      <td style="font-size:var(--text-xs);color:var(--color-text-muted)">${s.responsable}</td>
+      <td class="no-print"><button class="btn btn-ghost" style="font-size:var(--text-xs)" onclick="openModal('${s.folio}')">Estado</button>
+      <button class="btn btn-danger" style="font-size:var(--text-xs)" onclick="eliminar('${s.folio}')">Eliminar</button></td>
+    </tr>`).join('');
+}
+
+// ─── FILTERS ───────────────────────────────────────────────────────────
+function applyFilters(){
+  const q=document.getElementById('filter-search').value.toLowerCase();
+  const est=document.getElementById('filter-estado').value;
+  const pri=document.getElementById('filter-prioridad').value;
+  const filtered=solicitudes.filter(s=>{
+    const matchQ=!q||(s.folio+s.nombre+s.tipo+s.cargo).toLowerCase().includes(q);
+    const matchE=!est||s.estado===est;
+    const matchP=!pri||s.prioridad===pri;
+    return matchQ&&matchE&&matchP;
+  });
+  renderBitacora(filtered);
+}
+['filter-search','filter-estado','filter-prioridad'].forEach(id=>{
+  const el=document.getElementById(id);
+  if(el)el.addEventListener('input',applyFilters);
+});
+
+// ─── MODAL ESTADO ──────────────────────────────────────────────────────
+let modalFolio=null;
+function openModal(folio){
+  modalFolio=folio;
+  const s=solicitudes.find(x=>x.folio===folio);
+  if(!s)return;
+  document.getElementById('modal-title').textContent=`Actualizar — ${folio}`;
+  document.getElementById('modal-body').innerHTML=`
+    <p style="font-size:var(--text-sm);color:var(--color-text-muted);margin-bottom:var(--space-4)">
+      <strong>${s.nombre}</strong> — ${s.tipo} (×${s.cantidad})
+    </p>
+    <div class="form-group">
+      <label class="form-label">Nuevo Estado</label>
+      <select id="modal-estado" class="form-control">
+        <option ${s.estado==='Pendiente'?'selected':''}>Pendiente</option>
+        <option ${s.estado==='En Proceso'?'selected':''}>En Proceso</option>
+        <option ${s.estado==='Completada'?'selected':''}>Completada</option>
+        <option ${s.estado==='Rechazada'?'selected':''}>Rechazada</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Responsable</label>
+      <input id="modal-resp" class="form-control" value="${s.responsable}" placeholder="Nombre del responsable">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Observación del cambio</label>
+      <textarea id="modal-obs" class="form-control" rows="2" placeholder="Detallar el motivo del cambio de estado..."></textarea>
+    </div>`;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+document.getElementById('modal-confirm').onclick=function(){
+  const s=solicitudes.find(x=>x.folio===modalFolio);
+  if(!s)return;
+  s.estado=document.getElementById('modal-estado').value;
+  s.responsable=document.getElementById('modal-resp').value;
+  const obs=document.getElementById('modal-obs').value.trim();
+  s.historial.push({fecha:new Date().toLocaleDateString('es-CL'),accion:`Estado → ${s.estado}${obs?' | '+obs:''}`,usuario:'Sistema'});
+  closeModal();
+  renderDashboard();
+  renderBitacora();
+  toast(`✓ Estado actualizado: ${s.folio} → ${s.estado}`);
+};
+function closeModal(){
+  document.getElementById('modal-overlay').classList.remove('open');
+  modalFolio=null;
+}
+document.getElementById('modal-overlay').addEventListener('click',function(e){
+  if(e.target===this)closeModal();
+});
+
+// ─── ELIMINAR ─────────────────────────────────────────────────────────
+function eliminar(folio){
+  if(!confirm(`¿Eliminar la solicitud ${folio}? Esta acción no se puede deshacer.`))return;
+  solicitudes=solicitudes.filter(s=>s.folio!==folio);
+  renderDashboard();
+  renderBitacora();
+  toast(`Solicitud ${folio} eliminada`,'warning');
+}
+
+// ─── EXPORT CSV ───────────────────────────────────────────────────────
+function exportCSV(){
+  if(!solicitudes.length){toast('No hay datos para exportar','warning');return;}
+  const headers=['Folio','Fecha','Nombre','Cargo','Asignatura','Email','Tipo','Cantidad','Prioridad','Estado','Responsable','Descripción','Justificación'];
+  const rows=solicitudes.map(s=>[s.folio,s.fecha,s.nombre,s.cargo,s.asignatura,s.email,s.tipo,s.cantidad,s.prioridad,s.estado,s.responsable,s.descripcion,s.justificacion].map(v=>`"${String(v||'').replace(/"/g,'""')}"`).join(','));
+  const csv=[headers.join(','),...rows].join('\n');
+  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download='BitacoraTICS2026.csv';a.click();
+  URL.revokeObjectURL(url);
+  toast('✓ CSV exportado exitosamente');
+}
+
+// ─── CIRCULAR COPY ────────────────────────────────────────────────────
+function copyCircular(){
+  const el=document.getElementById('circular-doc-content');
+  const text=el.innerText;
+  navigator.clipboard.writeText(text).then(()=>toast('✓ Texto copiado al portapapeles'));
+}
+
+// ─── HELPERS ─────────────────────────────────────────────────────────
+function estadoBadge(e){
+  const map={Pendiente:'badge-pending',  'En Proceso':'badge-in-progress', Completada:'badge-completed', Rechazada:'badge-rejected'};
+  return `<span class="badge ${map[e]||'badge-new'}"><span class="badge-dot"></span>${e}</span>`;
+}
+function prioridadBadge(p){
+  const map={alta:`<span class="badge badge-rejected">Alta</span>`,media:`<span class="badge badge-in-progress">Media</span>`,baja:`<span class="badge badge-completed">Baja</span>`};
+  return map[p]||`<span class="badge">${p}</span>`;
+}
+function toast(msg,type='success'){
+  const c=document.getElementById('toast-container');
+  const d=document.createElement('div');
+  d.className='toast';
+  d.textContent=msg;
+  if(type==='warning')d.style.background='var(--color-warning)';
+  c.appendChild(d);
+  setTimeout(()=>d.remove(),3000);
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────
+document.getElementById('circ-fecha').textContent=new Date().toLocaleDateString('es-CL',{year:'numeric',month:'long',day:'numeric'});
+
+// Demo data
+const demo=[
+  {folio:'TICS-2026-DEMO',fecha:'28/03/2026',timestamp:Date.now()-200000,nombre:'María González',cargo:'Docente',asignatura:'Informática',email:'mgonzalez@escuela.cl',tipo:'Tablet / Notebook',cantidad:3,descripcion:'Tablets para sala de computación',justificacion:'Necesarias para trabajo en aula móvil 7° básico',prioridad:'alta',fechaReq:'',observaciones:'',estado:'En Proceso',responsable:'Encargado TICS',historial:[{fecha:'28/03/2026',accion:'Solicitud registrada',usuario:'Sistema'},{fecha:'29/03/2026',accion:'Estado → En Proceso',usuario:'Sistema'}]},
+  {folio:'TICS-2026-DM2',fecha:'27/03/2026',timestamp:Date.now()-400000,nombre:'Carlos Pérez',cargo:'Jefe de UTP',asignatura:'',email:'cperez@escuela.cl',tipo:'Consumible (tóner, papel, cable)',cantidad:2,descripcion:'Tóner para impresoras HP LaserJet',justificacion:'Stock agotado, necesario para impresión de evaluaciones',prioridad:'alta',fechaReq:'',observaciones:'',estado:'Completada',responsable:'Encargado TICS',historial:[{fecha:'27/03/2026',accion:'Solicitud registrada',usuario:'Sistema'},{fecha:'28/03/2026',accion:'Estado → Completada | Entregado en bodega',usuario:'Sistema'}]},
+  {folio:'TICS-2026-DM3',fecha:'25/03/2026',timestamp:Date.now()-600000,nombre:'Ana Martínez',cargo:'Docente',asignatura:'Matemáticas',email:'amartinez@escuela.cl',tipo:'Proyector / Pantalla',cantidad:1,descripcion:'Proyector portátil para sala 203',justificacion:'El proyector instalado está dañado, impide clases digitales',prioridad:'media',fechaReq:'',observaciones:'',estado:'Pendiente',responsable:'Encargado TICS',historial:[{fecha:'25/03/2026',accion:'Solicitud registrada',usuario:'Sistema'}]},
+];
+solicitudes.push(...demo);
+folioCounter=4;
+updateFolioPreview();
+renderDashboard();
+</script>
+</body>
+</html>
